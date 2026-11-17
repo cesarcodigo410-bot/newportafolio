@@ -875,16 +875,23 @@
       <div class="overflow-hidden">
         <div id="motionTrack" class="motion-track">
 
-          <!-- Slide 1: Mupi Digital — Centro Comercial (vertical 1080×1920) -->
+          <!-- Slide 1: Mupi Digital — Centro Comercial
+               AJUSTE: la fotografía ahora es HORIZONTAL 16:9 (igual que el Slide 2) y el MUPI digital
+               está integrado en la escena. Así el carrusel ya no crece en vertical (antes 9:16) y
+               desaparece el espacio vacío en la parte inferior. El video (1080×1920) se proyecta sobre
+               la pantalla del MUPI usando el mismo sistema data-quad del Slide 3. -->
           <div class="motion-slide px-1">
-            <div class="max-w-xs sm:max-w-sm mx-auto">
-              <div class="mockup-frame aspect-[9/16]" style="--screen-top:8%; --screen-left:9%; --screen-width:82%; --screen-height:78%; --screen-radius:6px;">
-                <!-- Imagen del marco/mockup (fija): reemplazar por la fotografía real del mupi en el centro comercial -->
+            <div class="max-w-3xl mx-auto">
+              <div class="mockup-frame aspect-[16/9]">
+                <!-- Imagen del marco/mockup (fija): fotografía horizontal 1440×810 con el MUPI digital en escena.
+                     Para cambiarla, reemplazar images/mockup-mupi-centro-comercial.jpg (mantener 16:9). -->
                 <img class="mockup-bg" src="images/mockup-mupi-centro-comercial.jpg" alt="Mockup de referencia: mupi digital vertical en centro comercial" data-i18n-attr="alt:motion.4">
-                <div class="mockup-screen">
+                <!-- Pantalla del MUPI: 4 esquinas en % del marco (TL TR BR BL). Si se cambia la foto,
+                     solo recalcular estos 4 puntos; el JS de perspectiva no se toca. -->
+                <div class="mockup-screen-quad" data-quad="61.94,21.23 74.93,21.23 74.93,61.98 61.94,61.98" data-video-w="1080" data-video-h="1920">
                   <!-- 🔧 ACTUALIZAR AQUÍ: variable de fuente del video/animación (Mupi Digital, 1080×1920).
-                       Solo reemplazar el src del <source>; no mover ni redimensionar este contenedor. -->
-                  <video class="w-full h-full" autoplay="" muted="" loop="" playsinline="" poster="images/poster-mupi.jpg">
+                       Solo reemplazar el src del <source>; no tocar data-quad ni el resto de la estructura. -->
+                  <video autoplay="" muted="" loop="" playsinline="" poster="images/poster-mupi.jpg">
                     <source src="assets/video/mupi-centro-comercial.mp4" type="video/mp4">
                   </video>
                 </div>
