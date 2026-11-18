@@ -16,12 +16,17 @@
         formulario "Cuéntanos tu proyecto") y la opción "Enviar por WhatsApp" dentro del formulario.
         Para quitar ambos y dejar solo el envío por correo:  SHOW_WHATSAPP: false
 
+     0) HEADER_LOGO_GIF -> LOGO ANIMADO. Guarda tu GIF como  images/logo-header.gif  (o cambia la ruta aquí:
+        también acepta .png, .webp o .svg). Si el archivo existe, reemplaza al logo SVG de la barra superior
+        (misma altura, proporción automática). Si no existe o la ruta está vacía (''), se mantiene el SVG.
+
      3) Para cambiar el número de WhatsApp edita WHATSAPP_NUMBER (solo dígitos, con código de país,
         sin + ni espacios). El mensaje se arma solo con los datos que el cliente llena en el formulario.
      ===================================================================================== -->
 <script>
   window.SITE_FLAGS = {
     SHOW_INSIGHTS: false,                  // ← true = mostrar | false = ocultar "Pensamiento Creativo & Estrategia en Acción"
+    HEADER_LOGO_GIF: 'images/logo-header.gif',  // ← Logo animado de la barra superior: si existe este archivo, se usa en lugar del SVG. Déjalo vacío ('') para usar siempre el SVG.
     SHOW_WHATSAPP: true,                   // ← true = botón flotante + opción "Enviar por WhatsApp" en el formulario | false = solo correo
     WHATSAPP_NUMBER: '50255546863'         // Número del negocio con código de país, solo dígitos (+502 5554 6863). Funciona desde cualquier país.
   };
@@ -755,6 +760,20 @@
     youtube:   'https://www.youtube.com/@tu_usuario'
   };
 </script>
+
+<style>
+  /* Logo de la barra superior: acepta GIF/PNG/WebP/SVG de cualquier proporción */
+  .nav-logo{ max-width: 220px; object-fit: contain; }
+
+  /* Video dentro de las tarjetas del portafolio (mismo tratamiento visual que las imágenes) */
+  .port-card video{
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 1.1s cubic-bezier(.16,1,.3,1), filter .6s; filter: saturate(.85) brightness(.85);
+  }
+  .port-card:hover video{ transform: scale(1.06); filter: saturate(1.05) brightness(.95); }
+  /* Video dentro del modal del proyecto */
+  #modalCarouselTrack video{ width: 100%; height: calc(100% - 30px); object-fit: contain; display: block; background: #000; }  /* deja libre la franja de los puntos para que no tapen los controles */
+</style>
 </head>
 <body class="noise">
 <!-- Fondo ambiental (decorativo) -->
@@ -775,7 +794,7 @@
 <nav id="mainNav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 nav-glass">
   <div class="max-w-7xl mx-auto px-6 lg:px-10">
     <div id="navInner" class="flex items-center justify-between transition-all duration-500 py-3">
-      <a href="#inicio" class="flex items-center"><img src="images/logo-header.svg" alt="CÓDIGO - Creatividad Digital" class="h-7 md:h-8 w-auto" data-i18n-attr="alt:nav.1"></a>
+      <a href="#inicio" class="flex items-center"><img id="navLogo" src="images/logo-header.svg" alt="CÓDIGO - Creatividad Digital" class="nav-logo h-7 md:h-8 w-auto" data-i18n-attr="alt:nav.1"></a>
       <div class="hidden lg:flex items-center gap-10 font-mono text-[13px] tracking-wide">
         <a href="#inicio" class="hover:text-[var(--neon)] transition-colors" data-i18n="nav.2">INICIO</a>
         <a href="#nosotros" class="hover:text-[var(--neon)] transition-colors" data-i18n="nav.3">NOSOTROS</a>
@@ -1038,7 +1057,11 @@
         </div>
       </div>
 
-      <div data-aos="fade-up" data-aos-delay="80" class="port-card group rounded-2xl aspect-[4/3]" data-title="Video Publicitario" data-cat="Contenido Digital" data-client="Flugi" data-obj="Humanizar la comunicación de una empresa de software B2B para audiencias no técnicas." data-desc="Creamos una línea editorial de video y redes que tradujo funcionalidades técnicas en beneficios claros. El engagement en LinkedIn se multiplicó por 3.1 en el primer trimestre de campaña." data-images="[&quot;images/proyecto-05.jpg&quot;, &quot;images/proyecto-05-b.jpg&quot;]" tabindex="0" role="button" aria-label="Ver proyecto Órbita Tech">
+      <!-- VIDEO PUBLICITARIO: esta tarjeta acepta un video. Sube tu archivo (MP4 recomendado, también WebM) y escribe su ruta en data-video.
+           · En la tarjeta se reproduce en bucle, sin sonido, solo cuando está visible (la imagen de abajo sirve de póster y de respaldo).
+           · Al abrir el proyecto, el video es la primera pieza del carrusel, con controles y sonido disponible.
+           · Para quitar el video y dejar solo imagen: borra el atributo data-video. (Esta función sirve en cualquier otra tarjeta .port-card.) -->
+      <div data-aos="fade-up" data-aos-delay="80" class="port-card group rounded-2xl aspect-[4/3]" data-title="Video Publicitario" data-cat="Contenido Digital" data-client="Flugi" data-video="assets/video/video-publicitario.mp4" data-obj="Humanizar la comunicación de una empresa de software B2B para audiencias no técnicas." data-desc="Creamos una línea editorial de video y redes que tradujo funcionalidades técnicas en beneficios claros. El engagement en LinkedIn se multiplicó por 3.1 en el primer trimestre de campaña." data-images="[&quot;images/proyecto-05.jpg&quot;, &quot;images/proyecto-05-b.jpg&quot;]" tabindex="0" role="button" aria-label="Ver proyecto Órbita Tech">
         <img src="images/proyecto-05.jpg" alt="Proyecto Órbita Tech" class="w-full h-full object-cover" data-i18n-attr="alt:work.10">
         <div class="overlay absolute inset-0 p-8 flex flex-col justify-end">
           <span class="font-mono text-xs text-[var(--neon)] mb-2" data-i18n="work.11">CONTENIDO DIGITAL</span>
@@ -2320,9 +2343,19 @@
   let lastFocusedEl = null;
   let closeTimeoutId = null;
 
-  function renderModalCarousel(images, title){
-    carouselTrack.innerHTML = images.map((src, i) =>
-      `<div class="aspect-[16/10]"><img src="${src}" alt="${title} — ${t('dyn.image')} ${i + 1}"></div>`
+  // Detecta archivos de video por extensión (mp4, webm, mov, m4v, ogv)
+  const isVideoSrc = (src) => /\.(mp4|webm|mov|m4v|ogv)(\?.*)?$/i.test(src);
+  // Reproduce solo el video del slide activo (silenciado al inicio; con controles para activar el sonido)
+  function syncModalVideos(){
+    carouselTrack.querySelectorAll('video').forEach((v) => v.pause());
+    const slide = carouselTrack.children[modalIndex];
+    const v = slide && slide.querySelector('video');
+    if (v) { v.muted = true; const pr = v.play(); if (pr && pr.catch) pr.catch(() => {}); }
+  }
+  function renderModalCarousel(images, title, poster){
+    carouselTrack.innerHTML = images.map((src, i) => isVideoSrc(src)
+      ? `<div class="aspect-[16/10] bg-black"><video src="${src}" ${poster ? `poster="${poster}"` : ''} controls playsinline preload="metadata" aria-label="${title}"></video></div>`
+      : `<div class="aspect-[16/10]"><img src="${src}" alt="${title} — ${t('dyn.image')} ${i + 1}"></div>`
     ).join('');
     carouselTrack.style.transform = 'translateX(0%)';
     modalDotsWrap.innerHTML = '';
@@ -2338,10 +2371,12 @@
     modalNextBtn.classList.toggle('hidden', !multi);
     modalDotsWrap.classList.toggle('hidden', !multi);
     modalIndex = 0;
+    syncModalVideos();
   }
   function goToModalSlide(i){
     modalIndex = (i + modalImages.length) % modalImages.length;
     carouselTrack.style.transform = `translateX(-${modalIndex * 100}%)`;
+    syncModalVideos();
     Array.from(modalDotsWrap.children).forEach((d, idx) => d.classList.toggle('active', idx === modalIndex));
   }
   modalPrevBtn.addEventListener('click', () => goToModalSlide(modalIndex - 1));
@@ -2360,7 +2395,10 @@
     if (closeTimeoutId) { clearTimeout(closeTimeoutId); closeTimeoutId = null; }
     lastFocusedEl = document.activeElement;
     try { modalImages = JSON.parse(card.dataset.images); } catch (err) { modalImages = [card.dataset.img].filter(Boolean); }
-    renderModalCarousel(modalImages, card.dataset.title);
+    // Si la tarjeta tiene data-video, el video es la primera pieza del carrusel
+    if (card.dataset.video && modalImages.indexOf(card.dataset.video) === -1) modalImages = [card.dataset.video].concat(modalImages);
+    const cardImg = card.querySelector('img');
+    renderModalCarousel(modalImages, card.dataset.title, cardImg ? cardImg.getAttribute('src') : '');
     window.__modalCard = card;
     document.getElementById('modalCat').textContent = projectText(card, 'cat').toUpperCase();
     document.getElementById('modalTitle').textContent = card.dataset.title;
@@ -2376,6 +2414,7 @@
   }
 
   function closeModal(){
+    carouselTrack.querySelectorAll('video').forEach((v) => v.pause());   // detiene el video al cerrar
     modal.classList.remove('is-open');
     document.body.style.overflow = '';
     resumeSnapScroll();
@@ -2970,6 +3009,41 @@
       });
     }, { threshold: 0.6 });
     els.forEach(function(el){ io.observe(el); });
+  })();
+</script>
+
+<script>
+  /* ============ Logo animado (GIF) de la barra superior ============ */
+  (function(){
+    var f = window.SITE_FLAGS || {}, logo = document.getElementById('navLogo');
+    if (!logo || !f.HEADER_LOGO_GIF) return;
+    var probe = new Image();
+    probe.onload = function(){ logo.src = f.HEADER_LOGO_GIF; };      // solo se cambia si el archivo existe y carga bien
+    probe.src = f.HEADER_LOGO_GIF;                                    // si no existe, se queda el SVG original
+  })();
+
+  /* ============ Video en las tarjetas del portafolio (cualquier .port-card con data-video) ============ */
+  (function(){
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('.port-card[data-video]').forEach(function(card){
+      var src = card.dataset.video; if (!src) return;
+      var img = card.querySelector('img');
+      var v = document.createElement('video');
+      v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
+      v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true'); v.tabIndex = -1;
+      if (img) v.poster = img.getAttribute('src');
+      v.src = src;
+      v.addEventListener('error', function(){ v.remove(); });          // sin archivo o formato no válido: queda la imagen
+      if (img) img.after(v); else card.prepend(v);
+
+      var play = function(){ var p = v.play(); if (p && p.catch) p.catch(function(){}); };
+      if (reduce || !('IntersectionObserver' in window)) {              // movimiento reducido: solo al pasar el cursor / enfocar
+        card.addEventListener('mouseenter', play); card.addEventListener('focus', play);
+        card.addEventListener('mouseleave', function(){ v.pause(); }); card.addEventListener('blur', function(){ v.pause(); });
+      } else {
+        new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) play(); else v.pause(); }); }, { threshold: 0.35 }).observe(card);
+      }
+    });
   })();
 </script>
 </body></html>
