@@ -523,7 +523,7 @@
     transition: opacity .4s ease;
   }
   .mockup-screen-quad.is-ready{ opacity: 1; }
-  .mockup-screen-quad video{ width: 100%; height: 100%; object-fit: cover; display: block; }
+  .mockup-screen-quad video{ width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; display: block; }  /* sin deformar: si la proporción difiere, recorta parejo arriba/abajo */
 
   /* ---- i18n: selector de idioma (glass) + cross-fade suave ---- */
   .lang-btn{ line-height: 1; cursor: pointer; }
@@ -1124,8 +1124,11 @@
                 <!-- Contenedor de pantalla ajustado a la PERSPECTIVA real de la foto (proyección en 4 esquinas,
                      definidas en % del marco vía data-quad="TL TR BR BL"). Si se reemplaza la fotografía,
                      solo hay que recalcular estos 4 puntos; no tocar el JS de abajo. -->
-                <div class="mockup-screen-quad" data-quad="44.50,39.64 65.50,22.78 65.31,29.99 44.38,47.05" data-video-w="1536" data-video-h="336">
-                  <!-- 🔧 ACTUALIZAR AQUÍ: src del video/animación de la Valla Pasarela (1536×336).
+                <div class="mockup-screen-quad" data-quad="34.74,33.64 67.61,6.12 69.18,21.23 34.62,44.97" data-video-w="1536" data-video-h="326">
+                  <!-- AJUSTE (foto actualizada): data-quad medido sobre el área verde de images/mockup-valla-pasarela.jpg (1600×1067).
+                     data-video-h="326" = proporción real de la pantalla en perspectiva (~4.7:1); el video de 1536×336 se recorta
+                     ~5px arriba y abajo con object-fit: cover, sin deformarse. Si cambias la foto, recalcula data-quad (ver #calibrar). -->
+                <!-- 🔧 ACTUALIZAR AQUÍ: src del video/animación de la Valla Pasarela (1536×336).
                        Solo reemplazar el src del <source>; no tocar data-quad ni el resto de la estructura. -->
                   <video autoplay="" muted="" loop="" playsinline="" poster="images/poster-valla-pasarela.jpg">
                     <source src="assets/video/valla-pasarela.mp4" type="video/mp4">
