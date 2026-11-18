@@ -12,19 +12,18 @@
         Para mostrarla de nuevo:  SHOW_INSIGHTS: true
         (La sección sigue completa en el HTML, id="insights"; solo está oculta.)
 
-     2) SHOW_WHATSAPP = true   ->  MUESTRA el botón flotante de WhatsApp (abajo a la derecha).
-        Para quitarlo:  SHOW_WHATSAPP: false
+     2) SHOW_WHATSAPP = true   ->  MUESTRA el botón flotante de WhatsApp (abajo a la derecha, lleva al
+        formulario "Cuéntanos tu proyecto") y la opción "Enviar por WhatsApp" dentro del formulario.
+        Para quitar ambos y dejar solo el envío por correo:  SHOW_WHATSAPP: false
 
-     3) Para cambiar el número o el mensaje de WhatsApp edita WHATSAPP_NUMBER (solo dígitos, con
-        código de país, sin + ni espacios) y WHATSAPP_MESSAGE_ES / WHATSAPP_MESSAGE_EN.
+     3) Para cambiar el número de WhatsApp edita WHATSAPP_NUMBER (solo dígitos, con código de país,
+        sin + ni espacios). El mensaje se arma solo con los datos que el cliente llena en el formulario.
      ===================================================================================== -->
 <script>
   window.SITE_FLAGS = {
     SHOW_INSIGHTS: false,                  // ← true = mostrar | false = ocultar "Pensamiento Creativo & Estrategia en Acción"
-    SHOW_WHATSAPP: true,                   // ← true = mostrar | false = ocultar botón de WhatsApp
-    WHATSAPP_NUMBER: '50255546863',        // +502 5554 6863 (Guatemala)
-    WHATSAPP_MESSAGE_ES: 'Hola CÓDIGO, me gustaría recibir información sobre sus servicios.',
-    WHATSAPP_MESSAGE_EN: 'Hi CÓDIGO, I would like to get more information about your services.'
+    SHOW_WHATSAPP: true,                   // ← true = botón flotante + opción "Enviar por WhatsApp" en el formulario | false = solo correo
+    WHATSAPP_NUMBER: '50255546863'         // Número del negocio con código de país, solo dígitos (+502 5554 6863). Funciona desde cualquier país.
   };
   if (!window.SITE_FLAGS.SHOW_INSIGHTS) document.documentElement.classList.add('hide-insights');
 </script>
@@ -665,6 +664,30 @@
     .amb-b, .amb-b i{ animation: none !important; transition: none !important; }
     .amb-spot{ display: none; }
   }
+</style>
+
+<style>
+  /* ============ Servicios de interés: contraste y estados (sin celeste) ============ */
+  select.field{
+    -webkit-appearance: none; appearance: none; cursor: pointer;
+    color: #E9EEF8; color-scheme: dark;
+    padding-right: 2.75rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23C3CEE3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 1rem center; background-size: 16px;
+  }
+  /* Hover sutil en el campo cerrado: indica que es interactivo */
+  select.field:hover{ border-color: rgba(255,255,255,.34); background-color: rgba(255,255,255,.06); }
+  /* Opciones desplegadas */
+  select.field option{ background: #0B1B36; color: #C9D3E6; }                        /* no seleccionada: gris azulado claro, alto contraste */
+  select.field option:hover, select.field option:focus{ background: #1A3263; color: #FFFFFF; }   /* hover */
+  select.field option:checked{ background: #0055FF linear-gradient(#0055FF,#0055FF); color: #FFFFFF; font-weight: 600; }  /* seleccionada: azul de marca */
+</style>
+
+<style>
+  .btn-whatsapp{ background: #128C7E; color: #fff; transition: background .3s, box-shadow .3s, transform .3s; }
+  .btn-whatsapp:hover{ background: #0E7A6D; box-shadow: 0 0 28px rgba(18,140,126,.45); }
+  .btn-whatsapp:focus-visible{ outline: 2px solid #fff; outline-offset: 3px; }
+  .btn-whatsapp[hidden]{ display: none; }
 </style>
 </head>
 <body class="noise">
@@ -1404,10 +1427,19 @@
             <label for="fmsg" class="font-mono text-xs text-[var(--grey-dim)] tracking-wide" data-i18n="contact.13">CUÉNTANOS SOBRE TU PROYECTO</label>
             <textarea id="fmsg" name="mensaje" required="" rows="4" placeholder="¿Qué necesitas lograr?" class="field w-full mt-2 rounded-lg px-4 py-3.5 text-sm resize-none" data-i18n-attr="placeholder:contact.14"></textarea>
           </div>
-          <button type="submit" class="btn-primary magnetic rounded-full px-8 py-4 font-medium w-full sm:w-auto inline-flex items-center justify-center gap-2">
-            <span data-i18n="contact.15">ENVIAR MENSAJE</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-          </button>
+          <!-- Un solo formulario, dos formas de enviar: ambas usan EXACTAMENTE los mismos datos de arriba -->
+          <p id="sendHow" class="font-mono text-xs text-[var(--grey-dim)] tracking-wide pt-1" data-i18n="contact.how">ELIGE CÓMO ENVIAR TU SOLICITUD</p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button type="submit" class="btn-primary rounded-full px-8 py-4 font-medium w-full sm:w-auto inline-flex items-center justify-center gap-2">
+              <span data-i18n="contact.15">ENVIAR POR CORREO</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"></rect><path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path></svg>
+            </button>
+            <!-- Se muestra solo si SHOW_WHATSAPP es true (PANEL DE INTERRUPTORES, al inicio del archivo) -->
+            <button type="button" id="sendWhatsApp" hidden class="btn-whatsapp rounded-full px-8 py-4 font-medium w-full sm:w-auto inline-flex items-center justify-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#waIcon"></use></svg>
+              <span data-i18n="contact.wa">ENVIAR POR WHATSAPP</span>
+            </button>
+          </div>
           <p id="formNote" class="font-mono text-xs text-[var(--neon)] hidden" role="status" aria-live="polite" data-i18n="contact.16">Mensaje enviado. Te contactaremos pronto.</p>
           <p id="formError" class="font-mono text-xs hidden" style="color:#ff8a8a" role="alert" data-i18n="contact.err">No se pudo enviar el mensaje. Inténtalo de nuevo o escríbenos directamente.</p>
         </form>
@@ -1591,7 +1623,9 @@
       "insights.12": "[ Sistemas de Marca ]",
       "insights.13": "Marcas hechas para escalar",
       "insights.14": "El sistema visual detrás de identidades que crecen sin perder consistencia.",
-      "wa.1": "Escríbenos por WhatsApp",
+      "wa.1": "Cuéntanos tu proyecto",
+      "contact.wa": "ENVIAR POR WHATSAPP",
+      "contact.how": "ELIGE CÓMO ENVIAR TU SOLICITUD",
       "method.1": "CÓMO OPERA EL ESTUDIO",
       "method.2": "El diseño no es para ganar premios, es el punto donde la estrategia, la emoción y la tecnología se cruzan para que un negocio venda más.",
       "method.3": "— DIRECCIÓN CREATIVA, CÓDIGO",
@@ -1616,7 +1650,7 @@
       "contact.12": "Soluciones Creativas",
       "contact.13": "CUÉNTANOS SOBRE TU PROYECTO",
       "contact.14": "¿Qué necesitas lograr?",
-      "contact.15": "ENVIAR MENSAJE",
+      "contact.15": "ENVIAR POR CORREO",
       "contact.16": "Mensaje enviado. Te contactaremos pronto.",
       "contact.err": "No se pudo enviar el mensaje. Inténtalo de nuevo o escríbenos directamente.",
       "contact.17": "© 2019 CÓDIGO — CREATIVIDAD DIGITAL. TODOS LOS DERECHOS RESERVADOS.",
@@ -1758,7 +1792,9 @@
       "insights.12": "[ Brand Systems ]",
       "insights.13": "Brands built to scale",
       "insights.14": "The visual system behind identities that grow without losing consistency.",
-      "wa.1": "Chat on WhatsApp",
+      "wa.1": "Tell us about your project",
+      "contact.wa": "SEND VIA WHATSAPP",
+      "contact.how": "CHOOSE HOW TO SEND YOUR REQUEST",
       "method.1": "HOW THE STUDIO OPERATES",
       "method.2": "Design isn't about winning awards — it's the point where strategy, emotion and technology intersect so a business can sell more.",
       "method.3": "— CREATIVE DIRECTION, CÓDIGO",
@@ -1783,7 +1819,7 @@
       "contact.12": "Creative Solutions",
       "contact.13": "TELL US ABOUT YOUR PROJECT",
       "contact.14": "What do you need to achieve?",
-      "contact.15": "SEND MESSAGE",
+      "contact.15": "SEND BY EMAIL",
       "contact.16": "Message sent. We'll be in touch soon.",
       "contact.err": "The message could not be sent. Please try again or write to us directly.",
       "contact.17": "© 2019 CÓDIGO — DIGITAL CREATIVITY. ALL RIGHTS RESERVED.",
@@ -2397,6 +2433,11 @@
     // Honeypot anti-spam: si un bot llenó el campo oculto, se ignora el envío.
     if (form.elements['_honey'] && form.elements['_honey'].value) return;
 
+    // Asunto claro para quien recibe el correo: servicio + nombre del cliente
+    if (form.elements['_subject']) {
+      form.elements['_subject'].value = 'Nueva solicitud de proyecto · ' + (form.elements['servicio'].value || 'General') + ' · ' + (form.elements['nombre'].value || '').trim() + ' — CÓDIGO';
+    }
+
     note.classList.add('hidden'); error.classList.add('hidden');
     btn.disabled = true; btn.style.opacity = '.7'; label.textContent = '...';
 
@@ -2563,11 +2604,14 @@
     function applyQuad(quadEl){
       const frame = quadEl.closest('.mockup-frame');
       if (!frame) return;
-      const rect = frame.getBoundingClientRect();
-      if (rect.width < 1 || rect.height < 1) return;
+      // PRECISIÓN: el marco tiene borde de 1px. Los hijos absolutos se posicionan dentro del borde,
+      // así que se mide la caja interior (clientWidth/Height) y no el rect exterior; antes los puntos
+      // se desplazaban ~1-2px hacia la derecha/abajo.
+      const cw = frame.clientWidth, ch = frame.clientHeight;
+      if (cw < 1 || ch < 1) return;
 
       const pts = quadEl.dataset.quad.trim().split(/\s+/).map(pair => pair.split(',').map(Number));
-      const quadPx = pts.map(([xp, yp]) => [rect.width * xp / 100, rect.height * yp / 100]);
+      const quadPx = pts.map(([xp, yp]) => [cw * xp / 100, ch * yp / 100]);
 
       const W = Number(quadEl.dataset.videoW) || 1536;
       const H = Number(quadEl.dataset.videoH) || 336;
@@ -2583,6 +2627,67 @@
     function refreshAllQuads(){
       document.querySelectorAll('.mockup-screen-quad[data-quad]').forEach(applyQuad);
     }
+
+    // ---------------------------------------------------------------------------------------
+    // HERRAMIENTA DE CALIBRACIÓN (opcional, solo cuando la URL termina en  #calibrar)
+    // Abre la página con  ...index.html#calibrar , ve a la pieza que quieras ajustar y arrastra los
+    // 4 puntos (1=arriba-izq, 2=arriba-der, 3=abajo-der, 4=abajo-izq) hasta las esquinas reales de la
+    // pantalla en la fotografía. Con un punto seleccionado, las flechas del teclado lo mueven con
+    // precisión (Shift = más rápido). Pulsa "Copiar" y pega el resultado en el atributo data-quad.
+    // ---------------------------------------------------------------------------------------
+    function initCalibration(){
+      const st = document.createElement('style');
+      st.textContent = '.cal-layer{position:absolute;inset:0;z-index:6;pointer-events:none}' +
+        '.cal-h{position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#ff3b6b;border:2px solid #fff;' +
+        'color:#fff;font:700 10px/14px monospace;text-align:center;cursor:grab;pointer-events:auto;touch-action:none;box-shadow:0 0 0 2px rgba(0,0,0,.5)}' +
+        '.cal-h.sel{background:#ffd400;color:#000}.cal-svg{position:absolute;inset:0;width:100%;height:100%}' +
+        '#calPanel{position:fixed;left:16px;bottom:16px;z-index:9999;max-width:min(560px,calc(100vw - 32px));background:#081A38;color:#fff;' +
+        'border:1px solid #ffd400;border-radius:12px;padding:12px 14px;font:12px/1.5 monospace}' +
+        '#calPanel button{margin-left:8px;padding:5px 10px;border-radius:8px;border:0;background:#ffd400;color:#000;font-weight:700;cursor:pointer}';
+      document.head.appendChild(st);
+      const panel = document.createElement('div'); panel.id = 'calPanel';
+      panel.innerHTML = '<b>MODO CALIBRACIÓN</b> — arrastra los puntos (1-4) a las esquinas de la pantalla. Flechas = ajuste fino.<br>' +
+        '<span id="calOut">—</span><button id="calCopy" type="button">Copiar</button>';
+      document.body.appendChild(panel);
+      const out = panel.querySelector('#calOut');
+
+      document.querySelectorAll('.mockup-screen-quad[data-quad]').forEach(q => {
+        const frame = q.closest('.mockup-frame'); if (!frame) return;
+        const layer = document.createElement('div'); layer.className = 'cal-layer';
+        layer.innerHTML = '<svg class="cal-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon fill="rgba(255,59,107,.12)" stroke="#ff3b6b" stroke-width=".25" vector-effect="non-scaling-stroke"/></svg>';
+        const poly = layer.querySelector('polygon');
+        frame.appendChild(layer);
+        let pts = q.dataset.quad.trim().split(/\s+/).map(x => x.split(',').map(Number));
+        let sel = 0;
+        const hs = pts.map((_, i) => { const h = document.createElement('div'); h.className = 'cal-h'; h.textContent = i + 1; layer.appendChild(h); return h; });
+        function draw(){
+          hs.forEach((h, i) => { h.style.left = pts[i][0] + '%'; h.style.top = pts[i][1] + '%'; h.classList.toggle('sel', i === sel); });
+          poly.setAttribute('points', pts.map(p => p.join(',')).join(' '));
+          q.dataset.quad = pts.map(p => p[0].toFixed(2) + ',' + p[1].toFixed(2)).join(' ');
+          applyQuad(q);
+          out.textContent = 'data-quad="' + q.dataset.quad + '"';
+        }
+        hs.forEach((h, i) => {
+          h.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); sel = i; h.setPointerCapture(e.pointerId); draw(); });
+          h.addEventListener('pointermove', e => {
+            if (!h.hasPointerCapture(e.pointerId)) return;
+            const r = frame.getBoundingClientRect();
+            pts[i] = [Math.min(100, Math.max(0, (e.clientX - r.left - frame.clientLeft) / frame.clientWidth * 100)),
+                      Math.min(100, Math.max(0, (e.clientY - r.top  - frame.clientTop)  / frame.clientHeight * 100))];
+            draw();
+          });
+        });
+        document.addEventListener('keydown', e => {
+          const d = { ArrowLeft:[-1,0], ArrowRight:[1,0], ArrowUp:[0,-1], ArrowDown:[0,1] }[e.key];
+          if (!d || !frame.matches(':hover')) return;
+          e.preventDefault(); const k = e.shiftKey ? .25 : .05;
+          pts[sel] = [pts[sel][0] + d[0] * k, pts[sel][1] + d[1] * k]; draw();
+        });
+        draw();
+      });
+      panel.querySelector('#calCopy').addEventListener('click', () => { navigator.clipboard && navigator.clipboard.writeText(out.textContent); });
+    }
+    if (location.hash === '#calibrar') window.addEventListener('load', () => setTimeout(initCalibration, 400));
 
     refreshAllQuads();
     window.addEventListener('load', refreshAllQuads);
@@ -2674,24 +2779,70 @@
 </script>
 
 <!-- ============ NOVEDAD: Botón flotante de WhatsApp (se controla con SHOW_WHATSAPP en el PANEL DE INTERRUPTORES, arriba) ============ -->
-<a id="waFloat" class="wa-float" href="https://wa.me/50255546863" target="_blank" rel="noopener noreferrer" hidden
-   aria-label="Escríbenos por WhatsApp" data-i18n-attr="aria-label:wa.1">
+<a id="waFloat" class="wa-float" href="#contacto" hidden
+   aria-label="Cuéntanos tu proyecto" data-i18n-attr="aria-label:wa.1">
   <span class="wa-float__btn" aria-hidden="true">
-    <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    <svg viewBox="0 0 24 24" fill="currentColor"><use href="#waIcon"></use></svg>
   </span>
-  <span class="wa-float__label" data-i18n="wa.1">Escríbenos por WhatsApp</span>
+  <span class="wa-float__label" data-i18n="wa.1">Cuéntanos tu proyecto</span>
 </a>
+
+<!-- Icono de WhatsApp (se define una sola vez y se reutiliza) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <symbol id="waIcon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></symbol>
+</defs></svg>
+
 <script>
+  /* ============ WhatsApp: botón flotante + envío desde el formulario "Cuéntanos tu proyecto" ============ */
   (function(){
-    var f = window.SITE_FLAGS || {}, a = document.getElementById('waFloat');
-    if (!a || !f.SHOW_WHATSAPP) return;                     // SHOW_WHATSAPP:false -> el botón no aparece
-    function build(){                                        // enlace directo al chat con mensaje precargado (según idioma)
-      var en = (document.documentElement.lang || '').toLowerCase().indexOf('en') === 0;
-      a.href = 'https://wa.me/' + f.WHATSAPP_NUMBER + '?text=' + encodeURIComponent(en ? f.WHATSAPP_MESSAGE_EN : f.WHATSAPP_MESSAGE_ES);
+    var f = window.SITE_FLAGS || {};
+    if (!f.SHOW_WHATSAPP) return;                              // SHOW_WHATSAPP:false -> solo correo
+
+    var float = document.getElementById('waFloat');
+    var form  = document.getElementById('contactForm');
+    var send  = document.getElementById('sendWhatsApp');
+
+    // Número internacional (solo dígitos, sin + ni ceros iniciales) -> https://wa.me/<número>
+    var number = String(f.WHATSAPP_NUMBER || '').replace(/\D/g, '').replace(/^0+/, '');
+
+    // 1) Botón flotante: lleva al formulario (único punto de recopilación de datos)
+    if (float) {
+      float.hidden = false;
+      float.addEventListener('click', function(e){
+        if (!form) return;
+        e.preventDefault();
+        if (typeof lenis !== 'undefined' && lenis && lenis.scrollTo) lenis.scrollTo(form, { offset: -140 });
+        else form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(function(){ var n = document.getElementById('fname'); if (n) n.focus({ preventScroll: true }); }, 800);
+      });
     }
-    build();
-    a.addEventListener('click', build);                      // refresca el mensaje si cambió el idioma
-    a.hidden = false;
+
+    // 2) Opción "Enviar por WhatsApp" dentro del formulario
+    if (!form || !send || number.length < 8) return;
+    send.hidden = false;
+
+    function buildMessage(){
+      var en  = (document.documentElement.lang || '').toLowerCase().indexOf('en') === 0;
+      var el  = form.elements;
+      var svc = el['servicio'].selectedOptions[0] ? el['servicio'].selectedOptions[0].textContent.trim() : el['servicio'].value;
+      var L = en
+        ? { t: 'New project request — CÓDIGO', n: 'Name', e: 'Email', s: 'Service of interest', p: 'About the project' }
+        : { t: 'Nueva solicitud de proyecto — CÓDIGO', n: 'Nombre', e: 'Correo', s: 'Servicio de interés', p: 'Sobre el proyecto' };
+      var msg = (el['mensaje'].value || '').trim().slice(0, 1500);       // evita URLs excesivamente largas
+      return '*' + L.t + '*\n\n' +
+             '*' + L.n + ':* ' + el['nombre'].value.trim() + '\n' +
+             '*' + L.e + ':* ' + el['email'].value.trim() + '\n' +
+             '*' + L.s + ':* ' + svc + '\n\n' +
+             '*' + L.p + ':*\n' + msg;
+    }
+
+    send.addEventListener('click', function(){
+      if (form.elements['_honey'] && form.elements['_honey'].value) return;   // anti-spam
+      if (!form.reportValidity()) return;                                      // mismos campos obligatorios que el correo
+      var url = 'https://wa.me/' + number + '?text=' + encodeURIComponent(buildMessage());
+      var w = window.open(url, '_blank', 'noopener');                          // móvil: abre la app · escritorio: WhatsApp Web/Desktop
+      if (!w) window.location.href = url;                                      // si el navegador bloquea la ventana
+    });
   })();
 </script>
 </body></html>
