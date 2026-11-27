@@ -27,7 +27,7 @@
   window.SITE_FLAGS = {
     SHOW_CTA: false,                        // ← true = mostrar la sección "SIGUIENTE PASO" (oculta por defecto: el orden final de la página no la incluye)
     SHOW_INSIGHTS: false,                  // ← true = mostrar | false = ocultar "Pensamiento Creativo & Estrategia en Acción"
-    HEADER_LOGO_GIF: '',  // ← Logo animado de la barra superior: si existe este archivo, se usa en lugar del SVG. Déjalo vacío ('') para usar siempre el SVG.
+    HEADER_LOGO_GIF: 'images/logo-header.gif',  // ← Logo animado de la barra superior: si existe este archivo, se usa en lugar del SVG. Déjalo vacío ('') para usar siempre el SVG.
     SHOW_WHATSAPP: true,                   // ← true = botón flotante + opción "Enviar por WhatsApp" en el formulario | false = solo correo
     WHATSAPP_NUMBER: '50255546863'         // Número del negocio con código de país, solo dígitos (+502 5554 6863). Funciona desde cualquier país.
   };
@@ -760,7 +760,8 @@
 
 <style>
   /* Logo de la barra superior: acepta GIF/PNG/WebP/SVG de cualquier proporción */
-  .nav-logo{ max-width: 220px; object-fit: contain; }
+  .nav-logo{ display: block; height: 28px; width: auto; max-width: 220px; object-fit: contain; }
+  @media (min-width: 768px){ .nav-logo{ height: 32px; } }
 
   /* Video dentro de las tarjetas del portafolio (mismo tratamiento visual que las imágenes) */
   .port-card video{
@@ -1028,6 +1029,21 @@
   }
 
 </style>
+
+<style id="hero-composicion">
+  /* CAMBIO 2 — composición del texto del Hero (solo distribución; mismo contenido, tipografía y color) */
+  h1.hero-title{ font-size: 2.5rem; line-height: 1.1; letter-spacing: -0.005em; max-width: 100%; }
+  h1.hero-title .hero-line{ display: block; text-wrap: balance; }
+  h1.hero-title .hero-line--2{ margin-top: .08em; }
+  .word-stage{ white-space: nowrap; }
+  @media (min-width: 640px){ h1.hero-title{ font-size: 3.25rem; } }
+  @media (min-width: 768px){
+    h1.hero-title{ font-size: clamp(2.6rem, 4.1vw, 3.9rem); line-height: 1.06; }
+    h1.hero-title .hero-line{ white-space: nowrap; }          /* 2 líneas limpias: «Diseño con …,» / «pensado para destacar.» */
+    #hero-intro > p.mt-8{ margin-top: 2rem; max-width: 30rem; }
+    #hero-intro > .mt-10{ margin-top: 2.25rem; }
+  }
+</style>
 </head>
 <body class="noise">
 <!-- Fondo ambiental (decorativo) -->
@@ -1094,8 +1110,9 @@
   <div class="grid md:grid-cols-12 gap-10 md:gap-6 items-end">
     <div class="md:col-span-7 order-2 md:order-1 hero-intro" id="hero-intro">
       <p class="text-[var(--terracotta)] text-sm mb-6 tracking-wide" data-i18n="hero.eyebrow">Diseñador Gráfico Senior | Creativo Digital</p>
-      <h1 class="font-serif-display text-[2.6rem] leading-[1.08] sm:text-6xl md:text-7xl md:leading-[1.05]">
-        <span data-i18n="hero.pre">Diseño con</span> <span class="word-stage"><span id="dynamic-word" class="font-serif-display">precisión</span></span>,<br class="hidden sm:block"> <span data-i18n="hero.post">pensado para destacar.</span>
+      <h1 class="font-serif-display hero-title">
+        <span class="hero-line"><span data-i18n="hero.pre">Diseño con</span> <span class="word-stage"><span id="dynamic-word" class="font-serif-display">precisión</span></span>,</span>
+        <span class="hero-line hero-line--2" data-i18n="hero.post">pensado para destacar.</span>
       </h1>
       <p class="mt-8 max-w-md text-[var(--muted)] text-base leading-relaxed" data-i18n="hero.desc">Transformo ideas en experiencias visuales que construyen marcas, comunican con intención y generan valor.</p>
       <div class="mt-10 flex flex-wrap items-center gap-4">
@@ -1748,7 +1765,7 @@
       <div>
         <p data-aos="fade-up" class="eyebrow mb-6" data-i18n="contact.1">HABLEMOS</p>
         <h2 data-aos="fade-up" data-aos-delay="80" class="font-display font-bold text-4xl md:text-5xl mb-8 leading-tight" data-i18n="contact.2">Cuéntame<br>tu <span class="brand-go">proyecto.</span></h2>
-        <p data-aos="fade-up" data-aos-delay="120" class="text-[var(--grey)] leading-relaxed max-w-md mb-10" data-i18n="contact.3"Conversemos sobre una oportunidad en tu equipo. Escríbeme si tienes una vacante abierta o buscas sumar un perfil creativo y estratégico a tu empresa. Hablemos directamente sobre el rol, los objetivos del equipo y cómo puedo aportar desde el primer día.</p>
+        <p data-aos="fade-up" data-aos-delay="120" class="text-[var(--grey)] leading-relaxed max-w-md mb-10" data-i18n="contact.3">Conversemos sobre una oportunidad en tu equipo. Escríbeme si tienes una vacante abierta o buscas sumar un perfil creativo y estratégico a tu empresa. Hablemos directamente sobre el rol, los objetivos del equipo y cómo puedo aportar desde el primer día.</p>
         <div data-aos="fade-up" data-aos-delay="160" class="space-y-5 font-mono text-sm">
           <a href="mailto:cesar.codigo410@gmail.com" class="flex items-center gap-3 hover:text-[var(--neon)] transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"></rect><path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="1.5"></path></svg>
@@ -2180,7 +2197,7 @@
       "contact.how": "CHOOSE HOW TO SEND YOUR REQUEST",
       "contact.1": "LET'S TALK",
       "contact.2": "Tell me<br>about your <span class=\"brand-go\">project.</span>",
-      "contact.3": "Tell me what you need and let's talk about your brand. No endless forms, no unnecessary sales calls — just an honest conversation about your project.",
+      "contact.3": "Let's talk about an opportunity on your team. Write to me if you have an open position or want to add a creative and strategic profile to your company. Let's talk directly about the role, the team's goals and how I can contribute from day one.",
       "contact.4": "NAME",
       "contact.5": "Your name",
       "contact.6": "EMAIL",
@@ -3333,8 +3350,13 @@
     var f = window.SITE_FLAGS || {}, logo = document.getElementById('navLogo');
     if (!logo || !f.HEADER_LOGO_GIF) return;
     var probe = new Image();
-    probe.onload = function(){ logo.src = f.HEADER_LOGO_GIF; };      // solo se cambia si el archivo existe y carga bien
-    probe.src = f.HEADER_LOGO_GIF;                                    // si no existe, se queda el SVG original
+    probe.onload = function(){                                        // solo se cambia si el archivo existe y carga bien
+      var img = document.createElement('img');
+      img.id = 'navLogo'; img.className = 'nav-logo'; img.src = f.HEADER_LOGO_GIF;
+      img.alt = 'César Alfaro'; img.decoding = 'async';
+      logo.replaceWith(img);                                          // mismo lugar; altura fija (≤ barra), proporción automática
+    };
+    probe.src = f.HEADER_LOGO_GIF;                                    // si no existe, se queda el nombre en texto
   })();
 
   /* ============ Video en las tarjetas del portafolio (cualquier .port-card con data-video) ============ */
